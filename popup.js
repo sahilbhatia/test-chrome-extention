@@ -1,42 +1,23 @@
-// Initialize butotn with users's prefered color
-let changeColor = document.getElementById("changeColor");
+let logoutBtn = document.getElementById("logout-btn");
 
-chrome.storage.sync.get("color", ({ color }) => {
-  changeColor.style.backgroundColor = color;
-});
-
-// When the button is clicked, inject setPageBackgroundColor into current page
-changeColor.addEventListener("click", async () => {
+logoutBtn.addEventListener("click", async () => {
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-  chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    function: setPageBackgroundColor,
+  chrome.storage.local.set({ token: null }, () => {
+    console.log("Secret token removed from local storage!");
   });
-});
 
-// The body of this function will be execuetd as a content script inside the
-// current page
-function setPageBackgroundColor() {
-  chrome.storage.sync.get("color", ({ color }) => {
-    console.log("selected color: ", color)
-    document.body.style.backgroundColor = color;
+  chrome.storage.local.get(["token"], (result) => {
+    console.log("Secret token: ", result);
+    chrome.action.setPopup({ tabId: tab.id, popup: 'login.html' }, () => {
+      window.location.href = "/login.html";
+    });
   });
-}
-
-// Test code
-document.addEventListener('DOMContentLoaded', async () => {
-  console.log("DOM Content Loaded!");
-  let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
   chrome.scripting.executeScript({
     target: { tabId: tab.id },
     function: () => {
-      const emailSelector = document.querySelectorAll("input[name='email']")?.[0];
-      const pwdSelector = document.querySelectorAll("input[name='password']")?.[0];
-
-      console.log("Email: ", emailSelector?.value);
-      console.log("Password: ", pwdSelector?.value);
+      console.log("CS -> Logout btn clicked!: ");
     }
   });
 });
