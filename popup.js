@@ -3,12 +3,7 @@ let logoutBtn = document.getElementById("logout-btn");
 logoutBtn.addEventListener("click", async () => {
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-  chrome.storage.local.set({ token: null }, () => {
-    console.log("Secret token removed from local storage!");
-  });
-
-  chrome.storage.local.get(["token"], (result) => {
-    console.log("Secret token: ", result);
+  chrome.storage.local.get(["users"], users => {
     chrome.action.setPopup({ tabId: tab.id, popup: 'login.html' }, () => {
       window.location.href = "/login.html";
     });
