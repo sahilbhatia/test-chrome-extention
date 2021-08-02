@@ -18,8 +18,12 @@ loginBtn.addEventListener("click", async () => {
 
   chrome.scripting.executeScript({
     target: { tabId: tab.id },
-    function: () => {
-      console.log("CS -> Login btn clicked!: ");
+    function: async () => {
+      const utilsPath = chrome.runtime.getURL("utils.mjs");
+      console.log("Utils path: ", utilsPath);
+      const utils = await import(utilsPath);
+      // console.log("Utils: ", utils);
+      utils.log("CS -> Login btn clicked!: ");
     }
   });
 });
@@ -33,12 +37,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 });
 
-const getContentScript = function() {
+const getContentScript = async () => {
   console.log("inside content script!");
+  const utilsPath = chrome.runtime.getURL("utils.mjs");
+  console.log("Utils path: ", utilsPath);
+  const utils = await import(utilsPath);
+  // console.log("Utils: ", utils);
 
   const emailSelector = document.querySelectorAll("input[name='email']")?.[0];
   // const pwdSelector = document.querySelectorAll("input[name='password']")?.[0];
 
-  console.log("Email: ", emailSelector?.value);
+  utils.log("Email: ", emailSelector?.value);
   // console.log("Password: ", pwdSelector?.value);
 };
